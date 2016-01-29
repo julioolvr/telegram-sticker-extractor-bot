@@ -12,7 +12,9 @@
   "license": "ISC",
   "dependencies": {
     "babel": "^5.8.5",
+    "cwebp": "^1.1.0",
     "dotenv": "^1.2.0",
+    "request": "^2.69.0",
     "request-promise": "^2.0.0"
   },
   "devDependencies": {

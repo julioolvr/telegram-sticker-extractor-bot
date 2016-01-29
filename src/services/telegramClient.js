@@ -1,4 +1,5 @@
-import request from 'request-promise';
+import rp from 'request-promise';
+import request from 'request';
 
 /**
  * @class Client to communicate with Telegram's API.
@@ -8,7 +9,8 @@ export default class {
    * @param {string} token Token for the bot provided by Telegram.
    */
   constructor(token) {
-    this.baseUrl = `https://api.telegram.org/bot${token}`;
+    this.token = token;
+    this.baseUrl = `https://api.telegram.org/bot${this.token}`;
   }
 
   /**
@@ -18,7 +20,28 @@ export default class {
    * @return {Promise}       A promise for the request to Telegram's API.
    */
   sendText(text, chatId) {
-    return request.post(`${this.baseUrl}/sendMessage`, { form: { text: text, chat_id: chatId } });
+    return rp.post(`${this.baseUrl}/sendMessage`, { form: { text: text, chat_id: chatId } });
+  }
+
+  getFile(fileId) {
+    return rp.get(`${this.baseUrl}/getFile`, { qs: { file_id: fileId } })
+      .then(response => JSON.parse(response).result)
+      .then(fileData => {
+        return request.get(`https://api.telegram.org/file/bot${this.token}/${fileData.file_path}`);
+      });
+  }
+
+  sendFile(file, chatId) {
+    return rp.post(`${this.baseUrl}/sendDocument`, { formData: {
+      chat_id: chatId,
+      document: {
+        value: file,
+        options: {
+          contentType: 'image/png',
+          filename: 'sticker.png'
+        }
+      }
+    } });
   }
 
   /**
@@ -33,7 +56,7 @@ export default class {
       options.offset = this.lastOffset + 1;
     }
 
-    return request.get({url: `${this.baseUrl}/getUpdates`, qs: options})
+    return rp.get({url: `${this.baseUrl}/getUpdates`, qs: options})
       .then(response => JSON.parse(response).result)
       .then(updates => {
         if (updates.length === 0) {
