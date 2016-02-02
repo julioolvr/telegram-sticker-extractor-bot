@@ -1,5 +1,6 @@
 import rp from 'request-promise';
 import request from 'request';
+import got from 'got';
 
 /**
  * @class Client to communicate with Telegram's API.
@@ -27,7 +28,7 @@ export default class {
     return rp.get(`${this.baseUrl}/getFile`, { qs: { file_id: fileId } })
       .then(response => JSON.parse(response).result)
       .then(fileData => {
-        return request.get(`https://api.telegram.org/file/bot${this.token}/${fileData.file_path}`);
+        return got.stream(`https://api.telegram.org/file/bot${this.token}/${fileData.file_path}`);
       });
   }
 
