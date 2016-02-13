@@ -71,6 +71,10 @@ export default class {
         let ids = updates.map(update => update.update_id);
         this.lastOffset = Math.max(...ids);
         return updates.map(update => update.message);
+      })
+      .catch(error => {
+        console.error(`Error while trying to get updates: ${error}`);
+        return [];
       });
   }
 }
