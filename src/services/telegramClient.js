@@ -25,14 +25,17 @@ export default class {
   }
 
   getFile(fileId) {
+    console.log(`TelegramClient#getFile, url: ${this.baseUrl}/getFile`);
     return rp.get(`${this.baseUrl}/getFile`, { qs: { file_id: fileId } })
       .then(response => JSON.parse(response).result)
       .then(fileData => {
+        console.log(`TelegramClient#getFile, streaming, url: https://api.telegram.org/file/bot${this.token}/${fileData.file_path}`);
         return got.stream(`https://api.telegram.org/file/bot${this.token}/${fileData.file_path}`);
       });
   }
 
   sendFile(file, chatId) {
+    console.log(`TelegramClient#sendFile, url: ${this.baseUrl}/sendDocument`);
     return rp.post(`${this.baseUrl}/sendDocument`, { formData: {
       chat_id: chatId,
       document: {
@@ -57,6 +60,7 @@ export default class {
       options.offset = this.lastOffset + 1;
     }
 
+    console.log(`TelegramClient#getUpdates, offset: ${options.offset}, url: ${this.baseUrl}/getUpdates`);
     return rp.get({url: `${this.baseUrl}/getUpdates`, qs: options})
       .then(response => JSON.parse(response).result)
       .then(updates => {
